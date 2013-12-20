@@ -1,0 +1,11 @@
+*.jar
+*.war
+*.ear
+*.class
+.DS_Store
+.AppleDouble
+.Spotlight-V100
+.Trashes
+.classpath
+.project
+.settings/
