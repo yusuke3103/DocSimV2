@@ -97,12 +97,14 @@ public class Start extends HttpServlet{
 			 */
 			ReadClustData rcd = new ReadClustData();
 			Object ClustResult=rcd.getResult(Save_Dir+"cache/"+name+"_kclust");
+			Object DocLabel=rcd.getDocLabel(Save_Dir+"cache/"+name+"_label");
 			/**
 			 * ブラウザ表示
 			 */
 			ses.setAttribute("keyword", keyword);
 			ses.setAttribute("ClustResult", ClustResult);
 			ses.setAttribute("WebPage", WebPage);
+			ses.setAttribute("DocLabel", DocLabel);
 			RequestDispatcher rds = req.getRequestDispatcher("/left.jsp");
 			rds.forward(req, res);
 		}

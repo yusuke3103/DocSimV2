@@ -13,78 +13,96 @@ def extractNouns(doc):
     tagger = MeCab.Tagger()
     node=tagger.parseToNode(doc)
     re_word=re.compile("助詞|接尾|BOS|EOS|記号|名詞,数|助動詞|動詞|形容詞|サ変接続|接続詞|副詞|接頭詞|非自立| ")
+    #re_word=re.compile("助詞|接尾辞|接頭辞|BOS/EOS|特殊|判定|数詞|助動詞|動詞|指示詞|形容詞|接続詞|副詞| ")
+    #re_word=re.compile("BOS|EOS| ")
+    
     nouns=[]
     while node:
         if not re_word.findall(node.feature) and not node.surface.isspace():
             nouns.append(node.surface)
+            print('%s:%s' % (node.surface,node.feature))
         node = node.next
     return nouns
 
-##
-# TF-IDF計算
-##
-def calc_tfidf(doclist):
+def calc_tfidf(docWords):
     tokens=[]
-    for doc in doclist:
-        tokens+=doc
-    
+    doclist=[]
+    for url,doc in docWords.items():
+        doclist.append(doc)
+        for words in doc:
+            tokens+=doc
     tf_idf={}
     idf={}
     
     A=nltk.TextCollection(doclist)
     token_types=set(tokens)
+    
     for token_type in token_types:
         tf_idf[token_type]=A.tf_idf(token_type, tokens)
         idf[token_type]=A.idf(token_type)
-    
+        
     vec=getVec(tf_idf)
-    return tokens,vec,idf
-##
-# ラベル作成用・TF値の計算
-##
-def calc_tf(doclist):
-    tokens=[]
-    for doc in doclist:
-        tokens+=doc
+    return vec,idf
+
+def calc_tf(doclist,flag=False):
+    
+    if flag==True:
+        docs=doclist
+        doclist=[]
+        
+        for doc in docs:
+            doclist+=doc
+        
+    
     tf={}
     A=nltk.TextCollection(doclist)
-    token_types=set(tokens)
+    token_types=set(doclist)
+    
     for token_type in token_types:
-        tf[token_type]=A.tf(token_type, tokens)
+        tf[token_type]=A.tf(token_type, doclist)
     return tf
-
-##
-# ラベル作成
-# TFIDF値上位5件
-##
-def getLabels(tf,idf):
+    
+###    
+# ラベル
+###    
+def getLabels(tf,idf,top=5):
     labels=[]
     wordlist={}
     
-    #TFIDF値の計算
     for word in tf.keys():
         wordlist[word]=tf[word]*idf[word]
     
     for k,v in sorted(wordlist.items(),key=lambda x:x[1],reverse=True):
-        if len(labels) < 5:
+        if len(labels) < top:
             labels.append(k)
+        else:
+            break
     return labels
-##
-# ラベル作成
-##
-def makelabel(kclust,doclist,idf):
+
+def makeDocLabel(docTF,idf):
+    score={}
+    docLabel={}
+    
+    for url,tf in docTF.items():
+        #print '%s\n%s' % (url,tf)
+        labels=getLabels(tf,idf,1)
+        docLabel[url]=labels[0]
+    return docLabel
+
+def makeLabel(kclust,urlList,docWords,idf):
     labels=[]
+    
     for clustNo in kclust:
-        doc=[]
+        docs=[]
+        print clustNo
         for docNo in clustNo:
-            doc.append(doclist[docNo])
-        tf=calc_tf(doc)
+            url=urlList[docNo]
+            docs.append(docWords.get(url))
+        tf=calc_tf(docs,True)
         labels.append(getLabels(tf,idf))
     return labels
-##
-# TFIDF平均算出
-# 平均以上をベクトルに登録
-##
+        
+
 def getVec(tf_idf):
     avg=0
     vec={}

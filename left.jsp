@@ -15,9 +15,14 @@
 	colorlist.add("#191970");
 	colorlist.add("#dc143c");
 	colorlist.add("#9932cc");
+	
+	request.setCharacterEncoding("utf-8");
 	String color = (String)request.getAttribute("postColor");
+	String lab = (String)request.getAttribute("lab");
+	System.out.println(lab);
 	HashMap<String,HashMap<String,String>> WebPage=(HashMap)session.getAttribute("WebPage");
 	HashMap<String,ArrayList> ClustResult = (HashMap)session.getAttribute("ClustResult");
+	HashMap<String,ArrayList> DocLabels = (HashMap)session.getAttribute("DocLabels");
 %>
 <script type="text/javascript">
 function right(){
@@ -32,8 +37,10 @@ function right(){
 <font size="2px">
 <table>
 <%
-
-System.out.println(color);
+System.out.println(lab);
+if (DocLabels.containsValue(lab)){
+	
+}
 if(color==null||color.matches("#999999")){
 	for (String url:WebPage.keySet()){
 		ViewUrl.add(url);
@@ -42,9 +49,7 @@ if(color==null||color.matches("#999999")){
 	int num=colorlist.indexOf(color);
 	int x=0;
 	for (String label:ClustResult.keySet()){
-		System.out.println(x+"=="+num);
 		if(x==num){
-			System.out.println(x+"=="+num);
 			ViewUrl=new ArrayList(ClustResult.get(label));
 			System.out.println(ViewUrl);
 		}

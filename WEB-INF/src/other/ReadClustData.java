@@ -11,6 +11,24 @@ public class ReadClustData {
 	
 	private static ArrayList<String> PageURL;
 	private static HashMap<String, ArrayList<String>> ClustResult;
+	
+	private static HashMap<String, String> DocLabel;
+	
+	public HashMap<String, String> getDocLabel(String filepath){
+		DocLabel=new HashMap<String, String>();
+		try{
+			char sep=',';
+			CSVReader reader = new CSVReader(new FileReader(filepath),sep);
+			String[] nextLine;
+			while ((nextLine=reader.readNext())!=null){
+				DocLabel.put(nextLine[0], nextLine[1]);
+			}
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		return DocLabel;
+	}
+	
 	public HashMap<String, ArrayList<String>> getResult(String filepath){
 		ClustResult = new HashMap<String, ArrayList<String>>();
 		try{
@@ -30,7 +48,7 @@ public class ReadClustData {
 					i++;
 				}
 				String Label = PageURL.get(0);
-				
+				System.out.println(PageURL);
 				PageURL.remove(0);
 				ClustResult.put(Label, PageURL);
 			}

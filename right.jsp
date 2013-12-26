@@ -18,71 +18,74 @@
 </head>
 
 <%
-	HashMap<String,HashMap<String,String>>WebPage=(HashMap)session.getAttribute("WebPage");
-	HashMap<String,ArrayList<String>>ClustResult=(HashMap)session.getAttribute("ClustResult");
-	String keyword = (String)session.getAttribute("keyword");
-	ArrayList<String> color=new ArrayList();
-	color.add("#C71585");
-	color.add("#556b2f");
-	color.add("#191970");
-	color.add("#dc143c");
-	color.add("#9932cc");
+        HashMap<String,HashMap<String,String>>WebPage=(HashMap)session.getAttribute("WebPage");
+        HashMap<String,ArrayList<String>>ClustResult=(HashMap)session.getAttribute("ClustResult");
+        HashMap<String,String>DocLabel = (HashMap)session.getAttribute("DocLabel");
+        String keyword = (String)session.getAttribute("keyword");
+        ArrayList<String> color=new ArrayList();
+        color.add("#C71585");color.add("#556b2f");color.add("#191970");color.add("#dc143c");color.add("#9932cc");
 %>
 <script type="text/javascript">
 $(function(){
-	var data = {
-			label: '<%=keyword%>',
-			amount: '<%=WebPage.size()%>',
-			children:[
+        var data = {
+                        label: '<%=keyword%>',
+                        amount: '<%=WebPage.size()%>',
+                        children:[
 <%
 int i=0;
-	for(String Label:ClustResult.keySet()){
+        for(String Label:ClustResult.keySet()){
+        	System.out.println(Label);
+        	System.out.println(ClustResult.get(Label).size());
+        	System.out.println(color.get(i));
 %>
-				{ label:'<%=Label%>',amount:<%=ClustResult.get(Label).size()%>,color:'<%=color.get(i)%>',
-					children:[
-<%		
-		for(int x=0;x<ClustResult.get(Label).size();x++){
-			if(x+1!=ClustResult.get(Label).size()){
-%>
-						{label:'####',amount:1,color:'<%=color.get(i)%>'},
+                                { label:'<%=Label%>',amount:<%=ClustResult.get(Label).size()%>,color:'<%=color.get(i)%>',
+                                        children:[
+<%                
+                for(int x=0;x<ClustResult.get(Label).size();x++){
+                		String url=ClustResult.get(Label).get(x);
+                        if(x+1!=ClustResult.get(Label).size()){
+%>	
+                                                {label:'<%=DocLabel.get(url)%>',amount:1,color:'<%=color.get(i)%>'},
 <%
-			}else{
+                        }else{
 %>
-						{label:'####',amount:1,color:'<%=color.get(i)%>'}]	
+                                                {label:'<%=DocLabel.get(url)%>',amount:1,color:'<%=color.get(i)%>'}]        
 <%
-			}
-		}
-		if(i+1!=ClustResult.size()){
+                        }
+                	
+                }
+                if(i+1!=ClustResult.size()){
 %>
-		},
+                },
 <%
-		}else{
+                }else{
 %>
-		}
+                }
 <%
-		}
-		i++;
-	}
+                }
+                i++;
+        }
 %>
-	]};
-	new BubbleTree({
-		data:data,
-		bubbleType:'icon',
-		container: '.bubbletree'
-		});
+        ]};
+        new BubbleTree({
+                data:data,
+                bubbleType:'icon',
+                container: '.bubbletree'
+                });
 });
 </script>
 <body>
 <form name=filter action="Filter" target="left" method="post">
 <input id=co name=col type="hidden" value=#999999>
+<input id=label name=lab type="hidden" value="null">
 </form>
-	<div class="bubbletree"></div>
-	<div id="foot">
-		Built with <a href="http://okfnlabs.org/">Bubble Tree</a> from the 
-		<a href="http://okfn.org/">Open Knowledge Foundation</a>. <br>Design
-		and implementation by <a href="http://driven-by-data.net/">Gregor
-		Aisch</a> and
-		<a href="http://www.informationisbeautiful.net/">David McCandless</a>
-	</div>
+        <div class="bubbletree"></div>
+        <div id="foot">
+                Built with <a href="http://okfnlabs.org/">Bubble Tree</a> from the 
+                <a href="http://okfn.org/">Open Knowledge Foundation</a>. <br>Design
+                and implementation by <a href="http://driven-by-data.net/">Gregor
+                Aisch</a> and
+                <a href="http://www.informationisbeautiful.net/">David McCandless</a>
+        </div>
 </body>
 </html>

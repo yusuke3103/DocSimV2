@@ -1,9 +1,7 @@
 # -*- encoding:utf-8 -*-
-
+import functions
 import random
 from math import sqrt
-
-import functions
 
 def readfile(filepath):
     lines=[line for line in file(filepath)]
@@ -15,7 +13,6 @@ def readfile(filepath):
         rownames.append(p[0])
         data.append([float(x) for x in p[1:]])
     return rownames,data
-
 def pearson(p1,p2):
     
     sum1=sum(p1)
@@ -37,7 +34,6 @@ def kcluster(rows, distance=pearson, k=4):
     # Make k clusters with random
     ranges=[(min([row[i] for row in rows]), max([row[i] for row in rows])) for i in range(len(rows[0]))]
     clusters=[[random.random()*(ranges[i][1]-ranges[i][0])+ranges[i][0] for i in range(len(rows[0]))] for j in range(k)]
- 
     lastmatches = None
     for t in range(100):
         print 'Iteration %d' % t
@@ -69,20 +65,35 @@ def kcluster(rows, distance=pearson, k=4):
 ##
 # 結果の書き出し
 ##
-def output(labels,clust,url,filepath):
-    x=0
+def output(labels,kclust,url,filepath):
+    
     out=file(filepath,'w')
-    for r in clust:
+    x=0
+    
+    for r in kclust:
         for label in labels[x]:
-            out.write('%s|' % label)
+            out.write('%s ' % label)
         out.write('\t')
+        z=0
         for i in r:
-            out.write('%s\t' % url[i])
+            print len(r)
+            if z<len(r)-1:
+                out.write('%s\t' % url[i])
+            else:
+                out.write('%s' % url[i])
+            z+=1
         out.write('\n')
         x+=1
+    
+def main(kclust_path,alltfidf,docWords,idf):
+    dataList=[]
+    urlList=[]
+    for url,data in alltfidf.items():
+        urlList.append(url)
+        dataList.append(data)
         
-def main(vec_path,kclust_path,doclist,idf):
-    url,data=readfile(vec_path)
-    kclust=kcluster(data,k=5)
-    labels=functions.makelabel(kclust,doclist,idf)
-    output(labels,kclust,url,kclust_path)
+    kclust=kcluster(dataList,k=5)
+    #labels=functions.makeLabel(kclust,doclist,idf,docTF)
+    labels=functions.makeLabel(kclust,alltfidf.keys(),docWords,idf)
+    output(labels,kclust,urlList,kclust_path)
+    

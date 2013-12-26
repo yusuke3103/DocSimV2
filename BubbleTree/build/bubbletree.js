@@ -9,81 +9,81 @@
 /*global Raphael, TWEEN, vis4, vis4color, vis4loader */
 
 var BubbleTree = function(config, onHover, onUnHover) {
-
+    
 	var me = this;
-
+    
 	me.version = "2.0.2";
-
+    
 	me.$container = $(config.container);
-
+    
 	me.config = $.extend({
-		// this is where we look for the icons
-		rootPath: '',
-		// show full labels inside bubbles with min radius of 40px
-		minRadiusLabels: 40,
-		// just show the amounts inside bubbles with min radius of 20px
-		minRadiusAmounts: 20,
-		// hide labels at all for bubbles with min radius of 0 (deactivated by def)
-		minRadiusHideLabels: 0,
-		// trim labels after 50 characters
-		cutLabelsAt: 50
-	}, config);
-
+                         // this is where we look for the icons
+                         rootPath: '',
+                         // show full labels inside bubbles with min radius of 40px
+                         minRadiusLabels: 40,
+                         // just show the amounts inside bubbles with min radius of 20px
+                         minRadiusAmounts: 20,
+                         // hide labels at all for bubbles with min radius of 0 (deactivated by def)
+                         minRadiusHideLabels: 0,
+                         // trim labels after 50 characters
+                         cutLabelsAt: 50
+                         }, config);
+    
 	/*
 	 * this function is called when the user hovers a bubble
 	 */
 	//me.onHover = onHover;
-
+    
 	//me.onUnHover = onUnHover;
 	me.tooltip = config.tooltipCallback ? config.tooltipCallback : function() {};
 	if (config.tooltip) me.tooltip = config.tooltip;
-
+    
 	/*
 	 * stylesheet JSON that contains colors and icons for the bubbles
 	 */
 	me.style = config.bubbleStyles;
-
+    
 	me.ns = BubbleTree;
-
+    
 	/*
 	 * hashmap of all nodes by url token
 	 */
 	me.nodesByUrlToken = {};
-
+    
 	/*
 	 * flat array of all nodes
 	 */
 	me.nodeList = [];
-
+    
 	me.iconsByUrlToken = {};
-
+    
 	me.globalNodeCounter = 0;
-
+    
 	me.displayObjects = [];
-
+    
 	me.bubbleScale = 1;
-
+    
 	me.globRotation = 0;
-
+    
 	me.currentYear = config.initYear;
-
+    
 	me.currentCenter = undefined;
-
+    
 	me.currentTransition = undefined;
-
+    
 	me.baseUrl = '';
-
+    
 	/*
 	 * @public loadData
 	 */
 	me.loadData = function(url) {
 		$.ajax({
-			url: url,
-			dataType: 'json',
-			success: this.setData.bind(this)
-		});
+               url: url,
+               dataType: 'json',
+               success: this.setData.bind(this)
+               });
 	};
-
+    
 	/*
 	 * is either called directly or by $.ajax when data json file is loaded
 	 */
@@ -96,7 +96,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		me.initTween();
 		me.initHistory();
 	};
-
+    
 	/*
 	 * initializes the data tree, adds links to parent node for easier traversal etc
 	 */
@@ -107,7 +107,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		me.traverse(root, 0);
 		me.treeRoot = root;
 	};
-
+    
 	me.preprocessData = function(root) {
 		var me = this, maxNodes = me.config.maxNodesPerLevel;
 		if (maxNodes) {
@@ -127,51 +127,51 @@ var BubbleTree = function(config, onHover, onUnHover) {
 				}
 				root.children = keep;
 				root.children.push({
-					'label': 'More',
-					'name': 'more',
-					'amount': moveAmount,
-					'children': move,
-					'breakdown': breakdown
-				});
+                                   'label': 'More',
+                                   'name': 'more',
+                                   'amount': moveAmount,
+                                   'children': move,
+                                   'breakdown': breakdown
+                                   });
 			}
 		}
 	};
-
+    
 	/*
 	 * used for recursive tree traversal
 	 */
 	me.traverse = function(node, index) {
 		var c, child, pc, me = this, urlTokenSource, styles = me.config.bubbleStyles;
-
+        
 		//if (node.amount <= 0) return;
-
+        
 		if (!node.children) node.children = [];
-
+        
 		// store node in flat node list
 		me.nodeList.push(node);
-
+        
 		node.famount = me.ns.Utils.formatNumber(node.amount);
 		if (node.parent) node.level = node.parent.level + 1;
-
+        
 		if (me.config.clearColors === true) node.color = false;
-
+        
 		if (styles) {
-
+            
 			var props = ['color', 'shortLabel', 'icon'];
-
+            
 			$.each(props, function (p, prop) {
-				if (styles.hasOwnProperty('id') && styles.id.hasOwnProperty(node.id) && styles.id[node.id].hasOwnProperty(prop)) {
-					// use color by id
-					node[prop] = styles.id[node.id][prop];
-				} else if (node.hasOwnProperty('name') && styles.hasOwnProperty('name') && styles.name.hasOwnProperty(node.name) && styles.name[node.name].hasOwnProperty(prop)) {
-					// use color by id
-					node[prop] = styles.name[node.name][prop];
-				} else if (node.hasOwnProperty('taxonomy') && styles.hasOwnProperty(node.taxonomy) && styles[node.taxonomy].hasOwnProperty(node.name) && styles[node.taxonomy][node.name].hasOwnProperty(prop)) {
-					node[prop] = styles[node.taxonomy][node.name][prop];
-				}
-			});
+                   if (styles.hasOwnProperty('id') && styles.id.hasOwnProperty(node.id) && styles.id[node.id].hasOwnProperty(prop)) {
+                   // use color by id
+                   node[prop] = styles.id[node.id][prop];
+                   } else if (node.hasOwnProperty('name') && styles.hasOwnProperty('name') && styles.name.hasOwnProperty(node.name) && styles.name[node.name].hasOwnProperty(prop)) {
+                   // use color by id
+                   node[prop] = styles.name[node.name][prop];
+                   } else if (node.hasOwnProperty('taxonomy') && styles.hasOwnProperty(node.taxonomy) && styles[node.taxonomy].hasOwnProperty(node.name) && styles[node.taxonomy][node.name].hasOwnProperty(prop)) {
+                   node[prop] = styles[node.taxonomy][node.name][prop];
+                   }
+                   });
 		}
-
+        
 		if (!node.color) {
 			// use color from parent node if no other match available
 			if (node.level > 0) node.color = node.parent.color;
@@ -181,7 +181,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		if (node.children.length < 2 && node.color) {
 			node.color = vis4color.fromHex(node.color).saturation('*.86').x;
 		}
-
+        
 		if (node.level > 0) {
 			pc = node.parent.children;
 			if (pc.length > 1) {
@@ -197,41 +197,41 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		} else {
 			urlTokenSource = ''+me.globalNodeCounter;
 		}
-
+        
 		me.globalNodeCounter++;
-
+        
 		node.urlToken = urlTokenSource.toLowerCase().replace(/\W/g, "-");
 		while (me.nodesByUrlToken.hasOwnProperty(node.urlToken)) {
 			node.urlToken += '-';
 		}
 		me.nodesByUrlToken[node.urlToken] = node;
 		node.maxChildAmount = 0;
-
+        
 		// sort children
 		node.children = me.sortChildren(node.children, true, me.config.sortBy);
-
+        
 		$.each(node.children, function(c, child) {
-			child.parent = node;
-			node.maxChildAmount = Math.max(node.maxChildAmount, child.amount);
-			me.traverse(child, c);
-		});
-
+               child.parent = node;
+               node.maxChildAmount = Math.max(node.maxChildAmount, child.amount);
+               me.traverse(child, c);
+               });
+        
 		if (node.breakdowns) {
 			node.breakdownsByName = {};
 			$.each(node.breakdowns, function (c,bd) {
-				bd.famount = me.ns.Utils.formatNumber(bd.amount);
-				if (bd.name) node.breakdownsByName[bd.name] = bd;
-			});
+                   bd.famount = me.ns.Utils.formatNumber(bd.amount);
+                   if (bd.name) node.breakdownsByName[bd.name] = bd;
+                   });
 		}
 	};
-
+    
 	me.sortChildren = function(children, alternate, sortBy) {
 		var tmp = [], odd = true;
 		if (sortBy == 'label') {
 			sortBy = me.compareLabels;
 			alternate = false;
 		} else sortBy = me.compareAmounts;
-
+        
 		children.sort(sortBy);
 		if (alternate) {
 			while (children.length > 0) {
@@ -243,7 +243,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 			return children;
 		}
 	};
-
+    
 	/*
 	 * compares two items by amount
 	 */
@@ -252,7 +252,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		if (a.amount == b.amount) return 0;
 		return -1;
 	};
-
+    
 	/*
 	 * compares to item by label
 	 */
@@ -261,32 +261,32 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		if (a.label == b.label) return 0;
 		return -1;
 	};
-
+    
 	/*
 	 * initializes all that RaphaelJS stuff
 	 */
 	me.initPaper = function() {
 		var me = this, $c = me.$container, rt = me.treeRoot,
-			w = $c.width(), h = $c.height(),
-			paper = Raphael($c[0], w, h),
-			maxRad = Math.min(w, h) * 0.5 - 40,
-			base, Vector = me.ns.Vector,
-			origin = new Vector(w * 0.5, h * 0.5); // center
-
+        w = $c.width(), h = $c.height(),
+        paper = Raphael($c[0], w, h),
+        maxRad = Math.min(w, h) * 0.5 - 40,
+        base, Vector = me.ns.Vector,
+        origin = new Vector(w * 0.5, h * 0.5); // center
+        
 		me.width = w;
 		me.height = h;
 		me.paper = paper;
 		base = Math.pow((Math.pow(rt.amount, 0.6) + Math.pow(rt.maxChildAmount, 0.6)*2) / maxRad, 1.6666666667);
 		me.a2radBase = me.ns.a2radBase = base;
-
+        
 		me.origin = origin;
-
+        
 		$(window).resize(me.onResize.bind(me));
 	};
-
+    
 	me.onResize = function() {
 		var me = this, $c = me.$container, w = $c.width(), h = $c.height(),
-			maxRad = Math.min(w, h) * 0.5 - 40, base, rt = me.treeRoot, b, obj;
+        maxRad = Math.min(w, h) * 0.5 - 40, base, rt = me.treeRoot, b, obj;
 		me.paper.setSize(w, h);
 		me.origin.x = w * 0.5;
 		me.origin.y = h * 0.5;
@@ -294,25 +294,25 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		me.height = h;
 		base = Math.pow((Math.pow(rt.amount, 0.6) + Math.pow(rt.maxChildAmount, 0.6)*2) / maxRad, 1.6666666667);
 		me.a2radBase = me.ns.a2radBase = base;
-
+        
 		$.each(me.displayObjects, function(b, obj) {
-			if (obj.className == "bubble") {
-				obj.bubbleRad = me.ns.Utils.amount2rad(obj.node.amount);
-			}
-		});
+               if (obj.className == "bubble") {
+               obj.bubbleRad = me.ns.Utils.amount2rad(obj.node.amount);
+               }
+               });
 		// vis4.log(me);
 		if (me.currentCenter) {
 			me.changeView(me.currentCenter.urlToken);
 		}
 	};
-
+    
 	/*
 	 * initializes the Tweening engine
 	 */
 	me.initTween = function() {
 		this.tweenTimer = setInterval(this.loop, 1000/120);
 	};
-
+    
 	/*
 	 * creates instances for all bubbles in the dataset. the bubbles will
 	 * remain invisble until they enter the stage via changeView()
@@ -320,25 +320,25 @@ var BubbleTree = function(config, onHover, onUnHover) {
 	me.initBubbles = function() {
 		//vis4.log('initBubbles');
 		var me = this, rt = me.treeRoot, i, icons = false, Bubbles = me.ns.Bubbles, bubbleClass;
-
+        
 		me.bubbleClasses = [];
-
+        
 		// defaults to plain bubble
 		if (!me.config.hasOwnProperty('bubbleType')) me.config.bubbleType = ['plain'];
 		// convert to array if neccessairy
 		if (!$.isArray(me.config.bubbleType)) me.config.bubbleType = [me.config.bubbleType];
-
+        
 		if ($.isArray(me.config.bubbleType)) {
 			$.each(me.config.bubbleType, function(i) {
-				if (me.config.bubbleType[i] == 'icon') icons = true;
-				me.bubbleClasses.push(me.getBubbleType(me.config.bubbleType[i]));
-			});
+                   if (me.config.bubbleType[i] == 'icon') icons = true;
+                   me.bubbleClasses.push(me.getBubbleType(me.config.bubbleType[i]));
+                   });
 		}
-
+        
 		var rootBubble = me.createBubble(rt, me.origin, 0, 0, rt.color);
 		me.traverseBubbles(rootBubble);
 	};
-
+    
 	/*
 	 * returns the bubble class for a given bubble class id
 	 * e.g. 'icon' > BubbleTree.Bubbles.Icon
@@ -354,46 +354,46 @@ var BubbleTree = function(config, onHover, onUnHover) {
 			default: return Bubbles.Plain;
 		}
 	};
-
+    
 	/*
 	 * iterates over the complete tree and creates a bubble for
 	 * each node
 	 */
 	me.traverseBubbles = function(parentBubble) {
 		var me = this, ring,
-			a2rad = me.ns.Utils.amount2rad,
-			i, c, children, childBubble, childRadSum = 0, oa = 0, da, ca, twopi = Math.PI * 2;
+        a2rad = me.ns.Utils.amount2rad,
+        i, c, children, childBubble, childRadSum = 0, oa = 0, da, ca, twopi = Math.PI * 2;
 		children = parentBubble.node.children;
-
+        
 		// sum radii of all children
 		$.each(children, function(i,c) {
-			childRadSum += a2rad(c.amount);
-		});
-
+               childRadSum += a2rad(c.amount);
+               });
+        
 		if (children.length > 0) {
 			// create ring
 			ring = me.createRing(parentBubble.node, parentBubble.pos, 0, { stroke: '#888', 'stroke-dasharray': "-" });
 		}
-
+        
 		$.each(children, function(i,c) {
-
-			da = a2rad(c.amount) / childRadSum * twopi;
-			ca = oa + da*0.5;
-
-			if (isNaN(ca)) vis4.log(oa, da, c.amount, childRadSum, twopi);
-
-			c.centerAngle = ca;
-
-			childBubble = me.createBubble(c, parentBubble.pos, 0, ca, c.color);
-			// für jedes kind einen bubble anlegen und mit dem parent verbinden
-			oa += da;
-
-			me.traverseBubbles(childBubble);
-		});
-
+               
+               da = a2rad(c.amount) / childRadSum * twopi;
+               ca = oa + da*0.5;
+               
+               if (isNaN(ca)) vis4.log(oa, da, c.amount, childRadSum, twopi);
+               
+               c.centerAngle = ca;
+               
+               childBubble = me.createBubble(c, parentBubble.pos, 0, ca, c.color);
+               // für jedes kind einen bubble anlegen und mit dem parent verbinden
+               oa += da;
+               
+               me.traverseBubbles(childBubble);
+               });
+        
 	};
-
-
+    
+    
 	/*
 	 * creates a new bubble for a given node. the bubble type will be chosen
 	 * by the level of the node
@@ -402,78 +402,78 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		var me = this, ns = me.ns, i, b, bubble, classIndex = node.level;
 		if (isNaN(classIndex)) classIndex = 0;
 		classIndex = Math.min(classIndex, me.bubbleClasses.length-1);
-
+        
 		bubble = new me.bubbleClasses[classIndex](node, me, origin, rad, angle, color);
 		me.displayObjects.push(bubble);
 		return bubble;
 	};
-
+    
 	me.createRing = function(node, origin, rad, attr) {
 		var me = this, ns = me.ns, ring;
 		ring = new ns.Ring(node, me, origin, rad, attr);
 		me.displayObjects.push(ring);
 		return ring;
 	};
-
+    
 	/*
 	 * is called every time the user changes the view
 	 * each view is defined by the selected node (which is displayed
 	 */
 	me.changeView = function(token) {
 		var me = this,
-			paper = me.paper,
-			maxRad = Math.min(me.width, me.height) * 0.35,
-			ns = me.ns,
-			utils = ns.Utils,
-			o = me.origin,
-			l1attr = { stroke: '#ccc', 'stroke-dasharray': "- " },
-			l2attr = { stroke: '#ccc', 'stroke-dasharray': ". " },
-			a2rad = utils.amount2rad,
-			root = me.treeRoot,
-			nodesByUrlToken = me.nodesByUrlToken,
-			node = nodesByUrlToken.hasOwnProperty(token) ? nodesByUrlToken[token] : null,
-			t = new ns.Layout(),
-			bubble, tr, i, twopi = Math.PI * 2,
-			getBubble = me.getBubble.bind(me), getRing = me.getRing.bind(me),
-			unify = me.unifyAngle;
+        paper = me.paper,
+        maxRad = Math.min(me.width, me.height) * 0.35,
+        ns = me.ns,
+        utils = ns.Utils,
+        o = me.origin,
+        l1attr = { stroke: '#ccc', 'stroke-dasharray': "- " },
+        l2attr = { stroke: '#ccc', 'stroke-dasharray': ". " },
+        a2rad = utils.amount2rad,
+        root = me.treeRoot,
+        nodesByUrlToken = me.nodesByUrlToken,
+        node = nodesByUrlToken.hasOwnProperty(token) ? nodesByUrlToken[token] : null,
+        t = new ns.Layout(),
+        bubble, tr, i, twopi = Math.PI * 2,
+        getBubble = me.getBubble.bind(me), getRing = me.getRing.bind(me),
+        unify = me.unifyAngle;
 		if (node !== null) {
-
+            
 			// what do you we have to do here?
 			// - find out the origin position
 			// -
-
+            
 			var parent, grandpa, sibling, c, cn, rad1, rad2, rad, srad, sang, ring, tgtScale,
-				radSum, leftTurn = false, rightTurn = false;
-
-
-
+            radSum, leftTurn = false, rightTurn = false;
+            
+            
+            
 			// initially we will mark all bubbles and rings for hiding
 			// get....() will set this flag to false
 			for (i in me.displayObjects) me.displayObjects[i].hideFlag = true;
-
-
+            
+            
 			if (node == root || node.parent == root && node.children.length < 2) {
-
+                
 				t.$(me).bubbleScale = 1.0;
-
+                
 				// move origin to center
 				t.$(o).x = me.width * 0.5;
 				t.$(o).y = me.height * 0.5;
-
+                
 				// make the root bubble visible
 				parent = getBubble(root);
-
+                
 				//parent.childRotation = 0;
-
+                
 				if (node != root) {
 					parent.childRotation = -node.centerAngle;
 				}
-
+                
 				rad1 = a2rad(root.amount) + a2rad(root.maxChildAmount) + 20;
-
+                
 				ring = getRing(root);
 				t.$(ring).rad = rad1;
-
+                
 				for (i in root.children) {
 					cn = root.children[i];
 					// adjust rad and angle for children
@@ -481,81 +481,81 @@ var BubbleTree = function(config, onHover, onUnHover) {
 					t.$(bubble).angle = unify(cn.centerAngle + parent.childRotation);
 					t.$(bubble).rad = rad1;
 				}
-
+                
 			} else {
-
+                
 				// node is not the root node
-
+                
 				var origNode = node; // save the reference of the node..
-
+                
 				if (node.children.length < 2) { // ..because if it has no children..
 					node = node.parent;         // ..we center on its parent
 				}
-
+                
 				tgtScale = maxRad / (a2rad(node.amount) + a2rad(node.maxChildAmount)*2);
 				t.$(me).bubbleScale = tgtScale;
-
+                
 				parent = getBubble(node);
-
+                
 				if (me.currentCenter && me.currentCenter == node.left) rightTurn = true;
 				else if (me.currentCenter && me.currentCenter == node.right) leftTurn = true;
-
+                
 				var sa = me.shortestAngleTo;
 				//if (leftTurn) sa = me.shortestLeftTurn;
 				//if (rightTurn) sa = me.shortestRightTurn;
-
+                
 				t.$(parent).angle = sa(parent.angle, 0);
-
+                
 				// find the sum of all radii from node to root
 				rad1 = (a2rad(node.amount) + a2rad(node.maxChildAmount)) * tgtScale + 20;
-
+                
 				ring = getRing(node);
 				t.$(ring).rad = rad1;
-
+                
 				grandpa = getBubble(node.parent);
 				grandpa.childRotation = -node.centerAngle;
-
+                
 				var maybeRoot = grandpa;
-
+                
 				while (maybeRoot && maybeRoot.node.parent) {
 					maybeRoot = getBubble(maybeRoot.node.parent, true);
 					t.$(maybeRoot).rad = 0;
 				}
-
+                
 				t.$(grandpa).rad = 0;
 				//
 				var hw = me.width * 0.5;
-
+                
 				rad2 = 0 - Math.max(
-					//hw *0.8 - tgtScale * (a2rad(node.parent.amount)+a2rad(node.amount)), // maximum visible part
-					hw * 0.8 - tgtScale * (a2rad(node.parent.amount) + a2rad(Math.max(node.amount*1.15 + node.maxChildAmount*1.15, node.left.amount * 0.85, node.right.amount * 0.85))),
-					tgtScale*a2rad(node.parent.amount)*-1 + hw*0.15 // minimum visible part
-				) + hw;
-
+                                    //hw *0.8 - tgtScale * (a2rad(node.parent.amount)+a2rad(node.amount)), // maximum visible part
+                                    hw * 0.8 - tgtScale * (a2rad(node.parent.amount) + a2rad(Math.max(node.amount*1.15 + node.maxChildAmount*1.15, node.left.amount * 0.85, node.right.amount * 0.85))),
+                                    tgtScale*a2rad(node.parent.amount)*-1 + hw*0.15 // minimum visible part
+                                    ) + hw;
+                
 				//vis4.log('rad (parent) = '+rad2,'   rad (center) = ',rad1);
-
+                
 				if (node.left && node.right) {
 					var maxSiblSize = tgtScale * a2rad(Math.max(node.left.amount, node.right.amount));
 				}
-
+                
 				//rad2 = hw - (tgtScale*a2rad(node.parent.amount)*-1+ hw*0.15);
-
+                
 				radSum = rad1 + rad2;
-
+                
 				t.$(o).x = me.width * 0.5 - rad2 - (node != origNode ? rad1 * 0.35: 0);
 				t.$(o).y = me.height * 0.5;
-
+                
 				//vis4.log('o.x = '+o.x,'    t.$(o).x = '+t.$(o).x);
-
+                
 				new vis4.DelayedTask(1500, vis4, vis4.log, o, grandpa.pos);
-
+                
 				rad2 += me.width * 0.1;
-
+                
 				ring = getRing(node.parent);
 				t.$(ring).rad = rad2;
-
+                
 				t.$(parent).rad = rad2;
-
+                
 				var ao = 0-(node != origNode ? origNode.centerAngle + parent.childRotation: 0);
 				// children
 				for (i in node.children) {
@@ -565,16 +565,16 @@ var BubbleTree = function(config, onHover, onUnHover) {
 					t.$(bubble).angle = me.shortestAngleTo(bubble.angle, cn.centerAngle + parent.childRotation + ao);
 					t.$(bubble).rad = rad1;
 				}
-
+                
 				// left and right sibling
-
+                
 				var siblCut = me.height * 0.07;
-
+                
 				if (node.left) {
 					sibling = node.left;
 					srad = a2rad(sibling.amount)*tgtScale;
 					sang = twopi - Math.asin((me.paper.height*0.5 + srad - siblCut) / rad2);
-
+                    
 					bubble = getBubble(sibling);
 					t.$(bubble).rad = rad2;
 					t.$(bubble).angle = sa(bubble.angle, sang);
@@ -583,15 +583,15 @@ var BubbleTree = function(config, onHover, onUnHover) {
 					sibling = node.right;
 					srad = a2rad(sibling.amount)*tgtScale;
 					sang = Math.asin((me.paper.height*0.5 + srad - siblCut) / rad2);
-
+                    
 					bubble = getBubble(sibling);
 					t.$(bubble).rad = rad2;
 					t.$(bubble).angle = sa(bubble.angle, sang);
 				}
-
+                
 				node = origNode;
 			}
-
+            
 			// now we're going to check all hides and shows
 			for (i in me.displayObjects) {
 				var obj = me.displayObjects[i];
@@ -610,7 +610,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 					}
 				}
 			}
-
+            
 			tr = new ns.Transitioner($.browser.msie || me.currentCenter == node ? 0 : 1000);
 			tr.changeLayout(t);
 			me.currentTransition = tr;
@@ -619,22 +619,22 @@ var BubbleTree = function(config, onHover, onUnHover) {
 			}
 			me.currentCenter = node;
 			// vis4.log('currentNode = '+me.currentCenter);
-
+            
 		} else {
 			utils.log('node '+token+' not found');
 		}
 		// step1:
-
+        
 		// step2:
 	};
-
+    
 	me.unifyAngle = function(a) {
 		var pi = Math.PI, twopi = pi * 2;
 		while (a >= twopi) a -= twopi;
 		while (a < 0) a += twopi;
 		return a;
 	};
-
+    
 	me.shortestAngle = function(f, t) {
 		var deg = function(a) { return Math.round(a/Math.PI*180)+''; };
 		var pi = Math.PI, twopi = pi * 2, unify= me.unifyAngle;
@@ -643,41 +643,41 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		var sa = t - f;
 		if (sa > pi) sa -= twopi;
 		if (sa < -pi) sa += twopi;
-
+        
 		return sa;
 	};
-
+    
 	me.shortestAngleTo = function(f, t) {
 		return f+me.shortestAngle(f, t);
 	};
-
+    
 	me.shortestLeftTurn = function(f, t) {
 		var sa = me.shortestAngle(f, t);
 		if (sa > 0) sa = sa - Math.PI*2;
 		return f+sa;
 	};
-
+    
 	me.shortestRightTurn = function(f, t) {
 		var sa = me.shortestAngle(f, t);
 		if (sa < 0) sa = Math.PI*2 + sa;
 		return f+sa;
 	};
-
-
+    
+    
 	/*
 	 * returns the instance of a bubble for a given node
 	 */
 	me.getBubble = function(node, keepHidden) {
 		return this.getDisplayObject('bubble', node, keepHidden);
 	};
-
+    
 	/*
 	 *
 	 */
 	me.getRing = function(node) {
 		return this.getDisplayObject('ring', node);
 	};
-
+    
 	me.getDisplayObject = function(className, node, keepHidden) {
 		var me = this, i, o;
 		for (i in me.displayObjects) {
@@ -690,31 +690,31 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		}
 		vis4.log(className+' not found for node', node);
 	};
-
+    
 	/*
-	me.createRing = function(t, origin, rad, attr) {
-		var me = this, ns = me.ns,
-			ring = new ns.Ring(me, origin, attr, rad);
-		ring.toBack();
-		me.rings.push(ring);
-		t.$(ring).rad = rad;
-		return ring;
-	};
-	*/
-
+     me.createRing = function(t, origin, rad, attr) {
+     var me = this, ns = me.ns,
+     ring = new ns.Ring(me, origin, attr, rad);
+     ring.toBack();
+     me.rings.push(ring);
+     t.$(ring).rad = rad;
+     return ring;
+     };
+     */
+    
 	me.initHistory = function() {
 		$.history.init(me.urlChanged.bind(me), { unescape: ",/" });
 	};
-
+    
 	me.freshUrl = '';
-
+    
 	/*
 	 * callback for every url change, either initiated by user or
 	 * by this class itself
 	 */
 	me.urlChanged = function(hash) {
 		var me = this, tr = me.currentTransition;
-
+        
 		if (!me.freshUrl) {
 			// setting an url for the very first time
 			if (hash.indexOf('/~/')) {
@@ -722,7 +722,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 			}
 		}
 		me.freshUrl = hash;
-
+        
 		if (tr && tr.running) {
 			vis4.log('transition is running at the moment, adding listener');
 			tr.onComplete(me.changeUrl.bind(me));
@@ -730,16 +730,16 @@ var BubbleTree = function(config, onHover, onUnHover) {
 			me.changeUrl();
 		}
 	};
-
+    
 	/*
 	 * this function initiate the action which follows the url change
 	 */
 	me.changeUrl = function() {
 		var me = this, parts = me.freshUrl.split('/'), token = parts[parts.length-1], url;
-
+        
 		// var urlParts = me.freshUrl.split('/~/');
 		if (me.freshUrl === "") me.navigateTo(me.treeRoot);
-
+        
 		if (me.nodesByUrlToken.hasOwnProperty(token)) {
 			url = me.getUrlForNode(me.nodesByUrlToken[token]);
 			if (me.freshUrl != url) {
@@ -752,7 +752,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 			me.navigateTo(me.treeRoot);
 		}
 	};
-
+    
 	me.navigateTo = function(node, fromUrlChange) {
 		// vis4.log('bc.navigateTo(',node,',',fromUrlChange,')');
 		var me = this;
@@ -763,7 +763,7 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		$('.label2.'+node.id, me.$container).addClass('current');
 		$('.label.'+node.id, me.$container).addClass('current');
 	};
-
+    
 	/*
 	 * creates a valid url for a given node, e.g. /2010/health/medical-supplies
 	 */
@@ -777,34 +777,34 @@ var BubbleTree = function(config, onHover, onUnHover) {
 		parts.reverse();
 		return me.baseUrl+'/~/'+parts.join('/');
 	};
-
+    
 	me.onNodeClick = function(node) {
 		if ($.isFunction(me.config.nodeClickCallback)) {
 			me.config.nodeClickCallback(node);
 		}
 	};
-
+    
 	// removes all nodes
 	me.clean = function() {
 		var me = this, i;
 		$('.label').remove();
 		/*for (i in me.displayObjects) {
-			try {
-				if ($.isFunction(me.displayObjects[i].hide)) me.displayObjects[i].hide();
-			} catch (e) {
-
-			}
-		}*/
+         try {
+         if ($.isFunction(me.displayObjects[i].hide)) me.displayObjects[i].hide();
+         } catch (e) {
+         
+         }
+         }*/
 	};
-
+    
 	this.loop = function() {
 		TWEEN.update();
 	};
-
+    
 	if (!me.config.hasOwnProperty('data')) {
 		throw new Error('no data');
 	}
-
+    
 	if (typeof me.config.data == "string") {
 		// use the given js object
 		me.loadData();
@@ -820,10 +820,10 @@ BubbleTree.Styles = {};
 
 /*
  * stores visual attributes of all elements in the visualization
- * 
+ *
  */
 BubbleTree.Layout = function() {
-
+    
 	var me = this;
 	me.objects = [];
 	me.props = [];
@@ -834,7 +834,7 @@ BubbleTree.Layout = function() {
 	 * flare-style transitioner syntax
 	 *
 	 * if you have an object bubble, you can easily change its properties with
-	 * 
+	 *
 	 * var l = new OpenSpendings.BubbleTree.Layout();
 	 * l.$(bubble).radius = 30;
 	 * l.$(bubble).angle = 3.14;
@@ -884,9 +884,9 @@ BubbleTree.Line = function(bc, attr, origin, angle, fromRad, toRad) {
 	this.toRad = toRad;
 	
 	this.getXY = function() {
-		this.x1 = this.o.x + Math.cos(this.angle) * this.fromRad; 
+		this.x1 = this.o.x + Math.cos(this.angle) * this.fromRad;
 		this.y1 = this.o.y -Math.sin(this.angle) * this.fromRad;
-		this.x2 = this.o.x + Math.cos(this.angle) * this.toRad; 
+		this.x2 = this.o.x + Math.cos(this.angle) * this.toRad;
 		this.y2 = this.o.y  -Math.sin(this.angle) * this.toRad;
 	};
 	
@@ -894,8 +894,8 @@ BubbleTree.Line = function(bc, attr, origin, angle, fromRad, toRad) {
 		this.getXY();
 		console.log("foo", "M"+this.x1+" "+this.y1+"L"+this.x2+" "+this.y2, attr);
 		this.path = this.bc.paper.path(
-			"M"+this.x1+" "+this.y1+"L"+this.x2+" "+this.y2
-		).attr(this.attr);
+                                       "M"+this.x1+" "+this.y1+"L"+this.x2+" "+this.y2
+                                       ).attr(this.attr);
 	};
 	
 	this.draw = function() {
@@ -917,13 +917,13 @@ BubbleTree.Line = function(bc, attr, origin, angle, fromRad, toRad) {
  * you need to include the bubblechart.min.js first
  */
 BubbleTree.Loader = function(config) {
-
+    
 	var me = this;
-
+    
 	me.config = config;
-
+    
 	me.ns = BubbleTree;
-
+    
 	/*
 	 * loads data from a local JSON file
 	 */
@@ -931,15 +931,15 @@ BubbleTree.Loader = function(config) {
 		var me = this, url = me.config.data;
 		console.log('loading url ',url);
 		$.ajax({
-			url: url,
-			context: me,
-			dataType: 'json',
-			success: function(data) {
-				this.run(data);
-			}
-		});
+               url: url,
+               context: me,
+               dataType: 'json',
+               success: function(data) {
+               this.run(data);
+               }
+               });
 	};
-
+    
 	/*
 	 * run will be called by dataLoaded once, well, the data is loaded
 	 */
@@ -947,12 +947,12 @@ BubbleTree.Loader = function(config) {
 		var me = this;
 		// initialize bubble chart
 		var bubbleChart = new BubbleTree(
-			me.config
-		);
+                                         me.config
+                                         );
 		bubbleChart.setData(data);
 		me.config.instance = bubbleChart;
 	};
-
+    
 	if (!me.config.hasOwnProperty('data')) {
 		//console.error('BubbleTree Error: no data set', me.config);
 	}
@@ -1030,10 +1030,10 @@ BubbleTree.MouseEventGroup = function(target, members) {
 		// since we don't know which event will receive first, the unhover of the member
 		// the mouse is leaving or the hover of the member the mouse is entering, we will
 		// delay the final check a bit
-		new vis4.DelayedTask(25, me, me.handleMemberHoverDelayed, evt);	
+		new vis4.DelayedTask(25, me, me.handleMemberHoverDelayed, evt);
 		
 	};
-
+    
 	/*
 	 * will be called after all unhover events are processed
 	 */
@@ -1042,7 +1042,7 @@ BubbleTree.MouseEventGroup = function(target, members) {
 		// this will eventually override the false set by handleMemberUnHover a few
 		// milliseconds ok. Exactly what we want!
 		me.mouseIsOver = true;
-				
+        
 		if (!me.wasHovering) {
 			// the target is newly hovered
 			
@@ -1053,14 +1053,14 @@ BubbleTree.MouseEventGroup = function(target, members) {
 		} // else can be ignored, no news
 	};
 	
-
+    
 	me.handleMemberUnHover = function(evt) {
 		var me = this;
 		me.mouseIsOver = false;
 		// we need to wait a bit to find out if this is a real unhover event
 		// or just the change to another element in the member list
 		// so we need to delay the final check a bit (let's say 30ms)
-		new vis4.DelayedTask(40, me, me.handleMemberUnHoverDelayed, evt);	
+		new vis4.DelayedTask(40, me, me.handleMemberUnHoverDelayed, evt);
 	};
 	
 	me.handleMemberUnHoverDelayed = function(evt) {
@@ -1075,7 +1075,7 @@ BubbleTree.MouseEventGroup = function(target, members) {
 			}
 		}
 	};
-		
+    
 	/*
 	 * this function is used for later addition of member objects like dynamic tooltips
 	 */
@@ -1156,7 +1156,7 @@ BubbleTree.Ring = function(node, bc, o, rad, attr) {
  * - a node appears at the beginning of the transition
  * - a node disappears at the end of the transtion
  */
- 
+
 BubbleTree.Transitioner = function(duration) {
 	
 	var me = this;
@@ -1225,7 +1225,7 @@ BubbleTree.Transitioner = function(duration) {
 		
 		for (i in me.layout.objects) {
 			obj = me.layout.objects[i];
-			if (obj && $.isFunction(obj.draw)) obj.draw(); // the final draw	
+			if (obj && $.isFunction(obj.draw)) obj.draw(); // the final draw
 		}
 		// now hide all objects marked for hiding
 		for (i in me.layout.toHide) {
@@ -1246,7 +1246,7 @@ BubbleTree.Utils = {};
 BubbleTree.Utils.log = function() {
 	try {
 		if (window.hasOwnProperty('console')) console.log.apply(this, arguments);
-	} catch (e) {}	
+	} catch (e) {}
 };
 
 BubbleTree.Utils.amount2rad = function(a) {
@@ -1272,7 +1272,7 @@ BubbleTree.Utils.formatNumber = function(n) {
 
 BubbleTree.Vector = function(x,y) {
 	var me = this;
-	me.x = x; 
+	me.x = x;
 	me.y = y;
 	
 	/*
@@ -1309,7 +1309,7 @@ BubbleTree.Bubbles = BubbleTree.Bubbles || {};
  * represents a bubble
  */
 BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, color) {
-
+    
 	var ns = BubbleTree, utils = ns.Utils, me = this;
 	me.className = "bubble";
 	me.node = node;
@@ -1365,7 +1365,7 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 		var me = this;
 		me.bc.onNodeClick(me.node);
 		//if (me.node.children.length > 1) {
-			me.bc.navigateTo(me.node);
+        me.bc.navigateTo(me.node);
 		//}
 	};
 	
@@ -1391,10 +1391,10 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 	
 	me.draw = function() {
 		var me = this,
-			r = Math.max(5, me.bubbleRad * me.bc.bubbleScale),
-			ox = me.pos.x,
-			oy = me.pos.y,
-			devnull = me.getXY(),
+        r = Math.max(5, me.bubbleRad * me.bc.bubbleScale),
+        ox = me.pos.x,
+        oy = me.pos.y,
+        devnull = me.getXY(),
 		x = me.pos.x, y = me.pos.y;
 		if (!me.visible) return;
 		
@@ -1402,7 +1402,7 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 		if (me.node.children.length > 1) me.dashedBorder.attr({ cx: me.pos.x, cy: me.pos.y, r: r-4, 'stroke-opacity': me.alpha * 0.9 });
 		else me.dashedBorder.attr({ 'stroke-opacity': 0 });
 		
-
+        
 		//me.label.attr({ x: me.pos.x, y: me.pos.y, 'font-size': Math.max(4, me.bubbleRad * me.bc.bubbleScale * 0.25) });
 		
 		me.label.show();
@@ -1420,16 +1420,16 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 			me.label.hide();
 			me.label2.hide();
 		}
-
+        
 		me.label.css({ width: 2*r+'px', opacity: me.alpha });
 		me.label.css({ left: (me.pos.x-r)+'px', top: (me.pos.y-me.label.height()*0.5)+'px' });
-	
+        
 		var w = Math.max(70, 3*r);
 		me.label2.css({ width: w+'px', opacity: me.alpha });
 		me.label2.css({ left: (x - w*0.5)+'px', top: (y + r)+'px' });
-
+        
 		//if (me.icon) me.icon.translate(me.pos.x - ox, me.pos.y - oy);
-	
+        
 	};
 	
 	/*
@@ -1444,7 +1444,7 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 		
 		//$('#bubble-chart')
 		me.visible = false;
-
+        
 		
 		//if (me.icon) me.icon.remove();
 	};
@@ -1456,26 +1456,26 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 		var me = this, i, cx = me.pos.x, cy = me.pos.y, r = Math.max(5, me.bubbleRad * me.bc.bubbleScale);
 		
 		me.circle = me.paper.circle(cx, cy, r)
-			.attr({ stroke: false, fill: me.color });
-
+        .attr({ stroke: false, fill: me.color });
+        
 		me.dashedBorder = me.paper.circle(cx, cy, r-3)
-			.attr({ stroke: '#ffffff', 'stroke-dasharray': "- " });
-	
-	
+        .attr({ stroke: '#ffffff', 'stroke-dasharray': "- " });
+        
+        
 		me.label = $('<div class="label '+me.node.id+'"><div class="amount">'+utils.formatNumber(me.node.amount)+'</div><div class="desc">'+me.node.shortLabel+'</div></div>');
 		me.container.append(me.label);
 		
 		if (me.node.children.length > 0) {
 			$(me.circle.node).css({ cursor: 'pointer'});
 			$(me.label).css({ cursor: 'pointer'});
-		}	
+		}
 		
 		// additional label
 		me.label2 = $('<div class="label2 '+me.node.id+'"><span>'+me.node.shortLabel+'</span></div>');
 		me.container.append(me.label2);
 		
 		var list = [me.circle.node, me.label, me.dashedBorder.node];
-
+        
 		var mgroup = new me.ns.MouseEventGroup(me, list);
 		mgroup.click(me.onclick.bind(me));
 		mgroup.hover(me.onhover.bind(me));
@@ -1486,7 +1486,7 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 	};
 	
 	/*
-	 * adds an invisible bubble on top for seamless 
+	 * adds an invisible bubble on top for seamless
 	 * event handling
 	 */
 	me.addOverlay = function() {
@@ -1494,7 +1494,7 @@ BubbleTree.Bubbles.Plain = function(node, bubblechart, origin, radius, angle, co
 		var me = this;
 		
 		me.overlay = me.paper.circle(me.circle.attrs.cx, me.circle.attrs.cy, me.circle.attrs.r)
-			.attr({ stroke: false, fill: '#fff', 'opacity': 0});
+        .attr({ stroke: false, fill: '#fff', 'opacity': 0});
 		
 		if (Raphael.svg) {
 			me.overlay.node.setAttribute('class', me.node.id);
@@ -1515,7 +1515,7 @@ BubbleTree.Bubbles = BubbleTree.Bubbles || {};
  * represents a bubble
  */
 BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, color) {
-
+    
 	var ns = BubbleTree, utils = ns.Utils, me = this;
 	me.className = "bubble";
 	me.node = node;
@@ -1581,7 +1581,7 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 		
 		var showIcon = false; //this.bubbleRad * this.bc.bubbleScale > 30;
 		// create label
-
+        
 		me.initialized = true;
 		
 		//me.show();
@@ -1595,7 +1595,7 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 		me.bc.navigateTo(me.node);
 		
 	};
-		
+    
 	me.onhover = function(e) {
 		var me = this, c = me.bc.$container[0];
 		e.node = me.node;
@@ -1623,13 +1623,13 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 		me.circle.attr({ cx: x, cy: y, r: r, 'fill-opacity': me.alpha });
 		if (me.node.children.length > 1) me.dashedBorder.attr({ cx: x, cy: y, r: r*0.85, 'stroke-opacity': me.alpha * 0.8 });
 		else me.dashedBorder.attr({ 'stroke-opacity': 0 });
-
+        
 		if (me.breakdown.length > 1) {
 			// draw breakdown chart
 			var i,x0,x1,x2,x3,y0,y1,y2,y3,ir = r*0.85, oa = -Math.PI * 0.5, da;
 			for (i in me.breakdown) {
 				da = me.breakdown[i] * Math.PI * 2;
-				x0 = x+Math.cos((oa))*ir; 
+				x0 = x+Math.cos((oa))*ir;
 				y0 = y+Math.sin((oa))*ir;
 				x1 = x+Math.cos((oa+da))*ir;
 				y1 = y+Math.sin((oa+da))*ir;
@@ -1644,7 +1644,7 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 				me.breakdownArcs[i].attr({ path: path, 'stroke-opacity': me.alpha*0.2, 'fill-opacity': me.breakdownOpacities[i]*me.alpha });
 			}
 		}
-
+        
 		//me.label.attr({ x: me.pos.x, y: me.pos.y, 'font-size': Math.max(4, me.bubbleRad * me.bc.bubbleScale * 0.25) });
 		if (!showLabel) {
 			me.label.hide();
@@ -1663,11 +1663,11 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 		
 		me.label.css({ width: 2*r*0.9+'px', opacity: me.alpha });
 		me.label.css({ left: (me.pos.x-r*0.9)+'px', top: (me.pos.y-me.label.height()*0.53)+'px' });
-	
+        
 		var w = Math.max(80, 3*r);
 		me.label2.css({ width: w+'px', opacity: me.alpha });
 		me.label2.css({ left: (x - w*0.5)+'px', top: (y + r)+'px' });
-	
+        
 	};
 	
 	/*
@@ -1696,14 +1696,14 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 		var me = this, i, r = Math.max(5, me.bubbleRad * me.bc.bubbleScale);
 		
 		me.circle = me.paper.circle(me.pos.x, me.pos.y, r)
-			.attr({ stroke: false, fill: me.color });
-
+        .attr({ stroke: false, fill: me.color });
+        
 		if ($.isFunction(me.bc.config.initTooltip)) {
 			me.bc.config.initTooltip(me.node, me.circle.node);
 		}
-
+        
 		me.dashedBorder = me.paper.circle(me.pos.x, me.pos.y,  r*0.85)
-			.attr({ stroke: '#fff', 'stroke-opacity': me.alpha * 0.4,  'stroke-dasharray': ". ", fill: false });
+        .attr({ stroke: '#fff', 'stroke-opacity': me.alpha * 0.4,  'stroke-dasharray': ". ", fill: false });
 		
 		me.label = $('<div class="label '+me.node.id+'"><div class="amount">'+utils.formatNumber(me.node.amount)+'</div><div class="desc">'+me.node.shortLabel+'</div></div>');
 		me.bc.$container.append(me.label);
@@ -1723,9 +1723,9 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 			me.breakdownArcs = {};
 			
 			for (i in me.breakdown) {
-				var col = me.breakdownColors[i] ? me.breakdownColors[i] : '#fff', 
-					arc = me.paper.path("M 0 0 L 2 2")
-					.attr({ fill: col, 'fill-opacity': Math.random()*0.4 + 0.3, stroke: '#fff'});
+				var col = me.breakdownColors[i] ? me.breakdownColors[i] : '#fff',
+                arc = me.paper.path("M 0 0 L 2 2")
+                .attr({ fill: col, 'fill-opacity': Math.random()*0.4 + 0.3, stroke: '#fff'});
 				me.breakdownArcs[i] = arc;
 				// $(arc.node).hover(me.arcHover.bind(me), me.arcUnhover.bind(me));
 				
@@ -1753,10 +1753,10 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 	
 	
 	me.arcHover = function(e) {
-		var me = this, c = me.bc.$container[0], i, 
-			arcs = me.breakdownArcs, node, 
-			bd = me.node.breakdowns;
-			
+		var me = this, c = me.bc.$container[0], i,
+        arcs = me.breakdownArcs, node,
+        bd = me.node.breakdowns;
+        
 		for (i in arcs) {
 			if (arcs[i].node == e.target) {
 				e.node = bd[i];
@@ -1773,10 +1773,10 @@ BubbleTree.Bubbles.Donut = function(node, bubblechart, origin, radius, angle, co
 	};
 	
 	me.arcUnhover = function(e) {
-		var me = this, c = me.bc.$container[0], i, 
-			arcs = me.breakdownArcs, node, 
-			bd = me.node.breakdowns;
-			
+		var me = this, c = me.bc.$container[0], i,
+        arcs = me.breakdownArcs, node,
+        bd = me.node.breakdowns;
+        
 		for (i in arcs) {
 			if (arcs[i].node == e.target) {
 				e.node = bd[i];
@@ -1802,7 +1802,7 @@ BubbleTree.Bubbles = BubbleTree.Bubbles || {};
  * represents a bubble
  */
 BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, color) {
-
+    
 	var ns = BubbleTree, utils = ns.Utils, me = this;
 	me.className = "bubble";
 	me.node = node;
@@ -1848,9 +1848,9 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 		if (!me.node.shortLabel) me.node.shortLabel = me.node.label.length > 50 ? me.node.label.substr(0, 30)+'...' : me.node.label;
 		
 		/*if (showIcon) {
-			me.icon = me.paper.path("M17.081,4.065V3.137c0,0,0.104-0.872-0.881-0.872c-0.928,0-0.891,0.9-0.891,0.9v0.9C4.572,3.925,2.672,15.783,2.672,15.783c1.237-2.98,4.462-2.755,4.462-2.755c4.05,0,4.481,2.681,4.481,2.681c0.984-2.953,4.547-2.662,4.547-2.662c3.769,0,4.509,2.719,4.509,2.719s0.787-2.812,4.557-2.756c3.262,0,4.443,2.7,4.443,2.7v-0.058C29.672,4.348,17.081,4.065,17.081,4.065zM15.328,24.793c0,1.744-1.8,1.801-1.8,1.801c-1.885,0-1.8-1.801-1.8-1.801s0.028-0.928-0.872-0.928c-0.9,0-0.957,0.9-0.957,0.9c0,3.628,3.6,3.572,3.6,3.572c3.6,0,3.572-3.545,3.572-3.545V13.966h-1.744V24.793z")
-				.translate(me.pos.x, me.pos.y).attr({fill: "#fff", stroke: "none"});
-		}*/
+         me.icon = me.paper.path("M17.081,4.065V3.137c0,0,0.104-0.872-0.881-0.872c-0.928,0-0.891,0.9-0.891,0.9v0.9C4.572,3.925,2.672,15.783,2.672,15.783c1.237-2.98,4.462-2.755,4.462-2.755c4.05,0,4.481,2.681,4.481,2.681c0.984-2.953,4.547-2.662,4.547-2.662c3.769,0,4.509,2.719,4.509,2.719s0.787-2.812,4.557-2.756c3.262,0,4.443,2.7,4.443,2.7v-0.058C29.672,4.348,17.081,4.065,17.081,4.065zM15.328,24.793c0,1.744-1.8,1.801-1.8,1.801c-1.885,0-1.8-1.801-1.8-1.801s0.028-0.928-0.872-0.928c-0.9,0-0.957,0.9-0.957,0.9c0,3.628,3.6,3.572,3.6,3.572c3.6,0,3.572-3.545,3.572-3.545V13.966h-1.744V24.793z")
+         .translate(me.pos.x, me.pos.y).attr({fill: "#fff", stroke: "none"});
+         }*/
 		
 		
 		me.initialized = true;
@@ -1864,17 +1864,17 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 	 */
 	me.show = function() {
 		var me = this, i, cx = me.pos.x, icon, cy = me.pos.y, r = Math.max(5, me.bubbleRad * me.bc.bubbleScale);
-				
+        
 		me.circle = me.paper.circle(cx, cy, r)
-			.attr({ stroke: false, fill: me.color });
-
+        .attr({ stroke: false, fill: me.color });
+        
 		me.dashedBorder = me.paper.circle(cx, cy, Math.min(r-3, r*0.95))
-			.attr({ stroke: '#ffffff', 'stroke-dasharray': "- " });
+        .attr({ stroke: '#ffffff', 'stroke-dasharray': "- " });
 		
 		if ($.isFunction(me.bc.config.initTooltip)) {
 			me.bc.config.initTooltip(me.node, me.circle.node);
 		}
-	
+        
 		me.label = $('<div class="label '+me.node.id+'"><div class="amount">'+utils.formatNumber(me.node.amount)+'</div><div class="desc">'+me.node.shortLabel+'</div></div>');
 		me.bc.$container.append(me.label);
 		
@@ -1889,16 +1889,16 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 		if (me.node.children.length > 0) {
 			$(me.circle.node).css({ cursor: 'pointer'});
 			$(me.label).css({ cursor: 'pointer'});
-		}	
+		}
 		
-		/*var 
-		list=[me.circle.node, me.label, me.dashedBorder.node],
-		mgroup = new me.ns.MouseEventGroup(me, list);
-		mgroup.click(me.onclick.bind(me));
-		mgroup.hover(me.onhover.bind(me));
-		mgroup.unhover(me.onunhover.bind(me));
-		me.mgroup = mgroup;
-		*/
+		/*var
+         list=[me.circle.node, me.label, me.dashedBorder.node],
+         mgroup = new me.ns.MouseEventGroup(me, list);
+         mgroup.click(me.onclick.bind(me));
+         mgroup.hover(me.onhover.bind(me));
+         mgroup.unhover(me.onunhover.bind(me));
+         me.mgroup = mgroup;
+         */
 		
 		me.visible = true;
 		
@@ -1908,7 +1908,7 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 		} else {
 			me.addOverlay();
 		}
-	};	
+	};
 	
 	/*
 	 * will load the icon as soon as needed
@@ -1954,7 +1954,7 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 	};
 	
 	/*
-	 * adds an invisible bubble on top for seamless 
+	 * adds an invisible bubble on top for seamless
 	 * event handling
 	 */
 	me.addOverlay = function() {
@@ -1962,7 +1962,7 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 		var me = this;
 		
 		me.overlay = me.paper.circle(me.circle.attrs.cx, me.circle.attrs.cy, me.circle.attrs.r)
-			.attr({ stroke: false, fill: '#fff', 'fill-opacity': 0});
+        .attr({ stroke: false, fill: '#fff', 'fill-opacity': 0});
 		
 		if (Raphael.svg) {
 			me.overlay.node.setAttribute('class', me.node.id);
@@ -1977,19 +1977,19 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 			// use q-tip tooltips
 			var tt = me.bc.tooltip.content(me.node);
 			$(me.overlay.node).qtip({
-				position: { 
-					target: 'mouse', 
-					viewport: $(window), 
-					adjust: { x:7, y:7 }
-				},
-				show: { 
-					delay: me.bc.tooltip.delay || 100 
-				},
-				content: {
-					title: tt[0],
-					text: tt[1]
-				}
-			});
+                                    position: {
+                                    target: 'mouse',
+                                    viewport: $(window),
+                                    adjust: { x:7, y:7 }
+                                    },
+                                    show: {
+                                    delay: me.bc.tooltip.delay || 100
+                                    },
+                                    content: {
+                                    title: tt[0],
+                                    text: tt[1]
+                                    }
+                                    });
 		}
 	};
 	
@@ -2007,25 +2007,25 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 	
 	me.draw = function() {
 		var me = this, 
-			r = Math.max(5, me.bubbleRad * me.bc.bubbleScale), 
-			ox = me.pos.x, 
-			oy = me.pos.y, 
-			devnull = me.getXY(), 
-			x = me.pos.x, y = me.pos.y, 
-			showIcon = me.hasIcon && r > 15,
-			showLabel = me.hasIcon ? r > 40 : r > 20,
-			i, path, scale, transform, ly;
+        r = Math.max(5, me.bubbleRad * me.bc.bubbleScale), 
+        ox = me.pos.x, 
+        oy = me.pos.y, 
+        devnull = me.getXY(), 
+        x = me.pos.x, y = me.pos.y, 
+        showIcon = me.hasIcon && r > 15,
+        showLabel = me.hasIcon ? r > 40 : r > 20,
+        i, path, scale, transform, ly;
 		
 		if (!me.visible) return;
 		
 		me.circle.attr({ cx: x, cy: y, r: r, 'fill-opacity': me.alpha });
 		if(me.overlay)
 			me.overlay.attr({ cx: x, cy: y, r: Math.max(10,r)});
-			
+        
 		if (me.node.children.length > 1) me.dashedBorder.attr({ cx: me.pos.x, cy: me.pos.y, r: Math.min(r-3, r-4), 'stroke-opacity': me.alpha * 0.9 });
 		else me.dashedBorder.attr({ 'stroke-opacity': 0 });
 		
-
+        
 		//me.label.attr({ x: me.pos.x, y: me.pos.y, 'font-size': Math.max(4, me.bubbleRad * me.bc.bubbleScale * 0.25) });
 		if (!showLabel) {
 			me.label.hide();
@@ -2094,7 +2094,7 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 		if (me.hasIcon) me.removeIcon();
 		if (me.overlay) me.overlay.remove();
 	};
-
+    
 	/*
 	 *
 	 */
@@ -2103,11 +2103,15 @@ BubbleTree.Bubbles.Icon = function(node, bubblechart, origin, radius, angle, col
 		me.bc.onNodeClick(me.node);
 		/**ここ！！！**/
 		//if (me.node.children.length > 1) {
-			me.bc.navigateTo(me.node);
-			var color = me.color.toString();
-			console.log(color);
-			document.getElementById("co").value=color;
-			document.filter.submit()
+        me.bc.navigateTo(me.node);
+        var color = me.color.toString();
+        var label = me.node.label.toString();
+        console.log(label);
+        console.log(color);
+        document.getElementById("co").value=color;
+        document.getElementById("label").value=label;
+        
+        document.filter.submit()
 		//}
 	};
 	

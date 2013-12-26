@@ -22,8 +22,11 @@ public class Filter extends HttpServlet {
     }
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("utf-8");
 		String color = request.getParameter("col");
+		String label = request.getParameter("lab");
 		request.setAttribute("postColor", color);
+		request.setAttribute("lab", label);
 	 	RequestDispatcher rds = request.getRequestDispatcher("/left.jsp");
  		rds.forward(request, response);
 	}
