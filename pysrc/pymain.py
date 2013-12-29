@@ -53,7 +53,7 @@ def output_tfidf(filepath,vec,wordcounts):
     return alltfidf    
 
 if __name__ == '__main__':
-    debug='on'
+    debug='off'
     argv=sys.argv
     
     if debug == 'on':

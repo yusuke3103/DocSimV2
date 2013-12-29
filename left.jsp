@@ -37,39 +37,15 @@ function right(){
 <font size="2px">
 <table>
 <%
-System.out.println(lab);
-if (DocLabels.containsValue(lab)){
-	
-}
-if(color==null||color.matches("#999999")){
-	for (String url:WebPage.keySet()){
-		ViewUrl.add(url);
-	}
-}else{
-	int num=colorlist.indexOf(color);
-	int x=0;
-	for (String label:ClustResult.keySet()){
-		if(x==num){
-			ViewUrl=new ArrayList(ClustResult.get(label));
-			System.out.println(ViewUrl);
-		}
-		x++;
-	}
-}
-for (int i=0;i<ViewUrl.size();i++){
-	String url = ViewUrl.get(i);
-	for(String title:WebPage.get(url).keySet()){
-		
+for (String url:WebPage.keySet()){
+	for (String title:WebPage.get(url).keySet()){
 %>
-<tr>
-	<td>
-		<a href="<%=url %>"><%=title%></a><br>
+		<tr><td>
+		<a href="+url+"><%=title%></a><br>
 		<%=WebPage.get(url).get(title)%>
-	</td>
-</tr>
-<%
+		</td></tr>
+<%		
 	}
-		
 }
 %>
 </table>

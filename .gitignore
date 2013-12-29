@@ -1,11 +1,24 @@
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must ends with two \r.
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
 *.jar
 *.war
 *.ear
-*.class
-.DS_Store
-.AppleDouble
-.Spotlight-V100
-.Trashes
-.classpath
-.project
-.settings/

@@ -22,10 +22,13 @@ import SearchAPI.BingSearch;
 
 @WebServlet("/Start")
 public class Start extends HttpServlet{
-	private static final long serialVersionUID = 1L;
 	
+	public static ArrayList<String> color= new ArrayList<String>(){{add("#C71585");add("#556b2f");add("#191970");add("#dc143c");add("#9932cc");}};
+    
+	private static final long serialVersionUID = 1L;
 	private static HashMap<String, HashMap<String, String>> WebPage;
 	private static String Save_Dir = null;
+	private static HashMap<String,ArrayList<String>> LabelGroup;
 	protected String Python = "/usr/bin/python";
 	
 	
@@ -34,6 +37,8 @@ public class Start extends HttpServlet{
 	}
 	
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException{
+		System.out.println(color);
+		LabelGroup = new HashMap<>();
 		WebPage = new HashMap<String, HashMap<String,String>>();
 		Save_Dir = getServletContext().getRealPath("/");
 		
@@ -97,13 +102,34 @@ public class Start extends HttpServlet{
 			 */
 			ReadClustData rcd = new ReadClustData();
 			Object ClustResult=rcd.getResult(Save_Dir+"cache/"+name+"_kclust");
-			Object DocLabel=rcd.getDocLabel(Save_Dir+"cache/"+name+"_label");
+			HashMap<String, String> DocLabel=rcd.getDocLabel(Save_Dir+"cache/"+name+"_label");
+			
+			/**
+			 * ラベルグループ作成
+			 */
+			System.out.println("ラベル登録");
+			for(String url:DocLabel.keySet()){
+				String label=DocLabel.get(url);
+				System.out.println(label);
+				System.out.println(url);
+				if(LabelGroup.containsKey(label)){
+					System.out.println("befor:"+LabelGroup.get(label));
+					LabelGroup.get(label).add(url);
+					System.out.println("after:"+LabelGroup.get(label));
+				}else{
+					System.out.println("初登録");
+					ArrayList<String> urls =new ArrayList<String>();
+					urls.add(url);
+					LabelGroup.put(label,urls);
+				}
+			}
 			/**
 			 * ブラウザ表示
 			 */
 			ses.setAttribute("keyword", keyword);
 			ses.setAttribute("ClustResult", ClustResult);
 			ses.setAttribute("WebPage", WebPage);
+			ses.setAttribute("LabelGroup", LabelGroup);
 			ses.setAttribute("DocLabel", DocLabel);
 			RequestDispatcher rds = req.getRequestDispatcher("/left.jsp");
 			rds.forward(req, res);

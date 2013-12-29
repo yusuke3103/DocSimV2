@@ -1,3 +1,4 @@
+<%@page import="servlet.Start"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.HashMap"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -22,8 +23,6 @@
         HashMap<String,ArrayList<String>>ClustResult=(HashMap)session.getAttribute("ClustResult");
         HashMap<String,String>DocLabel = (HashMap)session.getAttribute("DocLabel");
         String keyword = (String)session.getAttribute("keyword");
-        ArrayList<String> color=new ArrayList();
-        color.add("#C71585");color.add("#556b2f");color.add("#191970");color.add("#dc143c");color.add("#9932cc");
 %>
 <script type="text/javascript">
 $(function(){
@@ -36,20 +35,20 @@ int i=0;
         for(String Label:ClustResult.keySet()){
         	System.out.println(Label);
         	System.out.println(ClustResult.get(Label).size());
-        	System.out.println(color.get(i));
+        	System.out.println(Start.color.get(i));
 %>
-                                { label:'<%=Label%>',amount:<%=ClustResult.get(Label).size()%>,color:'<%=color.get(i)%>',
+                                { label:'<%=Label%><br><%=ClustResult.get(Label).size()%>件',amount:<%=ClustResult.get(Label).size()%>,color:'<%=Start.color.get(i)%>',
                                         children:[
 <%                
                 for(int x=0;x<ClustResult.get(Label).size();x++){
                 		String url=ClustResult.get(Label).get(x);
                         if(x+1!=ClustResult.get(Label).size()){
 %>	
-                                                {label:'<%=DocLabel.get(url)%>',amount:1,color:'<%=color.get(i)%>'},
+                                                {label:'<%=DocLabel.get(url)%>',amount:1,color:'<%=Start.color.get(i)%>'},
 <%
                         }else{
 %>
-                                                {label:'<%=DocLabel.get(url)%>',amount:1,color:'<%=color.get(i)%>'}]        
+                                                {label:'<%=DocLabel.get(url)%>',amount:1,color:'<%=Start.color.get(i)%>'}]        
 <%
                         }
                 	
