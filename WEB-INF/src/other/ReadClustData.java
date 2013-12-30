@@ -40,17 +40,18 @@ public class ReadClustData {
 				int i=0;
 				while(i<nextLine.length){
 					String a = nextLine[i];
-					if (a.equals("")){
+					if (a.length()==0){
 						break;
 					}else{
 						PageURL.add(a);
 					}
 					i++;
 				}
-				String Label = PageURL.get(0);
-				System.out.println(PageURL);
-				PageURL.remove(0);
-				ClustResult.put(Label, PageURL);
+				if(PageURL.size()!=0){
+					String Label = PageURL.get(0);
+					PageURL.remove(0);
+					ClustResult.put(Label, PageURL);
+				}
 			}
 		}catch (IOException e){
 			e.printStackTrace();

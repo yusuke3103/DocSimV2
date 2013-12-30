@@ -20,7 +20,7 @@ def extractNouns(doc):
     while node:
         if not re_word.findall(node.feature) and not node.surface.isspace():
             nouns.append(node.surface)
-            print('%s:%s' % (node.surface,node.feature))
+            #print('%s:%s' % (node.surface,node.feature))
         node = node.next
     return nouns
 
@@ -94,7 +94,7 @@ def makeLabel(kclust,urlList,docWords,idf):
     
     for clustNo in kclust:
         docs=[]
-        print clustNo
+        #print clustNo
         for docNo in clustNo:
             url=urlList[docNo]
             docs.append(docWords.get(url))

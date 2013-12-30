@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import other.Backup;
 import other.Command;
 import other.ReadClustData;
 import SearchAPI.BingSearch;
@@ -23,7 +24,7 @@ import SearchAPI.BingSearch;
 @WebServlet("/Start")
 public class Start extends HttpServlet{
 	
-	public static ArrayList<String> color= new ArrayList<String>(){{add("#C71585");add("#556b2f");add("#191970");add("#dc143c");add("#9932cc");}};
+	public static ArrayList<String> color= new ArrayList<String>(){{add("#C71585");add("#556b2f");add("#191970");add("#dc143c");add("#9932cc");add("#C71585");add("#556b2f");add("#191970");add("#dc143c");add("#9932cc");}};
     
 	private static final long serialVersionUID = 1L;
 	private static HashMap<String, HashMap<String, String>> WebPage;
@@ -41,7 +42,7 @@ public class Start extends HttpServlet{
 		LabelGroup = new HashMap<>();
 		WebPage = new HashMap<String, HashMap<String,String>>();
 		Save_Dir = getServletContext().getRealPath("/");
-		
+
 		/**
 		 * セッション処理
 		 * 接続ユーザ情報取得
@@ -64,6 +65,10 @@ public class Start extends HttpServlet{
 			String keyword = req.getParameter("keyword");
 			keyword.replaceAll("　", " ");					//全角スペース→半角スペース
 			System.err.println(keyword);
+			String theme = (String)req.getParameter("theme");
+			String times = (String)req.getParameter("times");
+			System.out.println(theme);
+			System.out.println(times);
 			
 			/**
 			 * Bingで検索
@@ -110,19 +115,17 @@ public class Start extends HttpServlet{
 			System.out.println("ラベル登録");
 			for(String url:DocLabel.keySet()){
 				String label=DocLabel.get(url);
-				System.out.println(label);
-				System.out.println(url);
 				if(LabelGroup.containsKey(label)){
-					System.out.println("befor:"+LabelGroup.get(label));
 					LabelGroup.get(label).add(url);
-					System.out.println("after:"+LabelGroup.get(label));
 				}else{
-					System.out.println("初登録");
 					ArrayList<String> urls =new ArrayList<String>();
 					urls.add(url);
 					LabelGroup.put(label,urls);
 				}
 			}
+			
+			Backup backup = new Backup();
+			backup.moveFile(name,Save_Dir,theme,times);
 			/**
 			 * ブラウザ表示
 			 */

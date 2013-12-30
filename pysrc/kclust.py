@@ -76,7 +76,6 @@ def output(labels,kclust,url,filepath):
         out.write('\t')
         z=0
         for i in r:
-            print len(r)
             if z<len(r)-1:
                 out.write('%s\t' % url[i])
             else:

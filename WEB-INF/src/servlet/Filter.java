@@ -51,7 +51,6 @@ public class Filter extends HttpServlet {
 				for (String title:WebPage.get(url).keySet()){
 					html+="<tr><td>";
 					html+="<a href="+url+">"+title+"</a><br>";
-					//html+="<font color=green>"+url+"</font><br>";
 					html+=WebPage.get(url).get(title);
 					html+="</td></tr>";
 				}
@@ -61,7 +60,6 @@ public class Filter extends HttpServlet {
 			int num=Start.color.indexOf(color);
 			int x=0;
 			if(LabelGroup.containsKey(lab)){
-				System.out.println(LabelGroup.get(lab));
 				ViewUrl=LabelGroup.get(lab);
 			}else{
 				for (String label:ClustResult.keySet()){
@@ -76,7 +74,6 @@ public class Filter extends HttpServlet {
 				for (String title:WebPage.get(url).keySet()){		
 					html+="<tr><td>";
 					html+="<a href="+url+">"+title+"</a><br>";
-					//html+="<font color=green>"+url+"</font><br>";
 					html+=WebPage.get(url).get(title);
 					html+="</td></tr>";
 				}
@@ -85,7 +82,7 @@ public class Filter extends HttpServlet {
 		html+="</table>";
 		html+="</font></body>";
 		html+="</html>";
-		System.out.println(html);
+		//System.out.println(html);
 		out.print(html);
 		//RequestDispatcher rds = request.getRequestDispatcher("/left.jsp");
  		//rds.forward(request, response);

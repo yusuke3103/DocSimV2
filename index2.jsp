@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>DocSimV2</title>
 </head>
-<frameset border=1 rows=10%,*>
+<frameset border=1 rows=15%,*>
 	<frame src=top.jsp name=top>
 	<frameset border=1 cols=40%,60%>
 		<frame src=first.html name=left>
