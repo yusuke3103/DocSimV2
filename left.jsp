@@ -41,7 +41,7 @@ for (String url:WebPage.keySet()){
 	for (String title:WebPage.get(url).keySet()){
 %>
 		<tr><td>
-		<a href="+url+"><%=title%></a><br>
+		<a href=<%=url%> target=_blank><%=title%></a><br>
 		<%=WebPage.get(url).get(title)%>
 		</td></tr>
 <%		

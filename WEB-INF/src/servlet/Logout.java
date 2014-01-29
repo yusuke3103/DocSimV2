@@ -22,8 +22,9 @@ public class Logout extends HttpServlet{
 		HttpSession session = req.getSession(true);
 		res.setCharacterEncoding("utf-8");
 		session.invalidate();
-		
+		res.setContentType("text/html;charset=utf-8");
 		PrintWriter out = res.getWriter();
+		
 		out.println("<!DOCTYPE html>");
 		out.println("<html>");
 	    out.println("<head>");

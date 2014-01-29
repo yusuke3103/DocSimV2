@@ -45,7 +45,7 @@ public class Filter extends HttpServlet {
 		html+="<HTML><HEAD><meta charset=utf-8></head>";
 		html+="<body><font size='2px'>";
 		html+="<table>";
-		
+		System.out.println(lab);
 		if (color.matches("#999999")){
 			for (String url:WebPage.keySet()){
 				for (String title:WebPage.get(url).keySet()){
@@ -73,7 +73,7 @@ public class Filter extends HttpServlet {
 				String url = ViewUrl.get(i);
 				for (String title:WebPage.get(url).keySet()){		
 					html+="<tr><td>";
-					html+="<a href="+url+">"+title+"</a><br>";
+					html+="<a href=\""+url+"\"target=_blank>"+title+"</a><br>";
 					html+=WebPage.get(url).get(title);
 					html+="</td></tr>";
 				}
